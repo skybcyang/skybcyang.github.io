@@ -1,193 +1,227 @@
 <!DOCTYPE html>
-<html  lang="zh">
+
+
+  <html class="light page-post">
+
+
 <head>
-    <meta charset="utf-8" />
+  <meta charset="utf-8">
+  
+  <title>持续集成和Jenkins杂谈 | SkybcYang_Space</title>
 
-<meta name="generator" content="Hexo 5.3.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  
+    <meta name="keywords" content="Jenkins,CI/CD," />
+  
 
-<title>持续集成和Jenkins杂谈 - SkybcYang_Space</title>
-
-
-    <meta name="description" content="关于持续集成&#x2F;持续部署&#x2F;持续交付的认识和看法，以及我设计的一个CI&#x2F;CD流程。">
+  <meta name="description" content="关于持续集成&#x2F;持续部署&#x2F;持续交付的认识和看法，以及我设计的一个CI&#x2F;CD流程。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="持续集成和Jenkins杂谈">
 <meta property="og:url" content="http://example.com/2018/11/28/post/Use-Jenkins/index.html">
 <meta property="og:site_name" content="SkybcYang_Space">
 <meta property="og:description" content="关于持续集成&#x2F;持续部署&#x2F;持续交付的认识和看法，以及我设计的一个CI&#x2F;CD流程。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/og_image.png">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Jenkins_logo_with_title.svg/1200px-Jenkins_logo_with_title.svg.png">
+<meta property="og:image" content="http://example.com/2018/11/28/post/Use-Jenkins/process.png">
 <meta property="article:published_time" content="2018-11-28T06:35:09.000Z">
 <meta property="article:modified_time" content="2019-11-06T14:31:46.000Z">
 <meta property="article:author" content="SkybcYang">
 <meta property="article:tag" content="Jenkins">
 <meta property="article:tag" content="CI&#x2F;CD">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/og_image.png">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Jenkins_logo_with_title.svg/1200px-Jenkins_logo_with_title.svg.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
 
 
-
-
-
-
-
-<link rel="icon" href="/images/favicon-16x16.png">
-
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-dark.css">
-
-
+  
     
-    
-    
-    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
-    
+<link rel="stylesheet" href="/css/personal-style.css">
 
-    
-    
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
-    
+  
 
-    
-    
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
 
-
-    
-    
-    
-    
-
-<link rel="stylesheet" href="/css/back-to-top.css">
+</script>
+<!-- End Google Analytics -->
 
 
-    
-    
-
-    
-    
-    
-    
-
-    
-    
-<link rel="stylesheet" href="/css/progressbar.css">
-<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
-
-    
-    
-    
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
-<link rel="stylesheet" href="/css/style.css">
-</head>
-<body class="is-2-column">
-    <nav class="navbar navbar-main">
-    <div class="container">
-        <div class="navbar-brand is-flex-center">
-            <a class="navbar-item navbar-logo" href="/">
-            
-                <img src="/images/favicon-32x32.png" alt="持续集成和Jenkins杂谈" height="28">
-            
-            </a>
-        </div>
-        <div class="navbar-menu">
-            
-            <div class="navbar-start">
-                
-                <a class="navbar-item"
-                href="/">主页</a>
-                
-                <a class="navbar-item"
-                href="/archives">归档</a>
-                
-                <a class="navbar-item"
-                href="/categories">分类</a>
-                
-                <a class="navbar-item"
-                href="/categories/leetcode">Leetcode</a>
-                
-                <a class="navbar-item"
-                href="/categories/github">Github</a>
-                
-                <a class="navbar-item"
-                href="/categories/essay">随笔</a>
-                
-                <a class="navbar-item"
-                href="/categories/game">游戏</a>
-                
-                <a class="navbar-item"
-                href="/categories/photo">摄影</a>
-                
-                <a class="navbar-item"
-                href="/tags">标签</a>
-                
-                <a class="navbar-item"
-                href="/about">关于</a>
-                
-            </div>
-            
-            <div class="navbar-end">
-                
-                    
-                    
-                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="https://github.com/skybcyang">
-                        
-                        <i class="fab fa-github"></i>
-                        
-                    </a>
-                    
-                
-                
-                
-                <a class="navbar-item search" title="搜索" href="javascript:;">
-                    <i class="fas fa-search"></i>
-                </a>
-                
-            </div>
-        </div>
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">ROOT</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">ROOT</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E3%80%81%E9%83%A8%E7%BD%B2%E5%92%8C%E4%BA%A4%E4%BB%98"><span class="toc-text">持续集成、部署和交付</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E9%9B%86%E6%88%90%E5%B7%A5%E5%85%B7"><span class="toc-text">常用的集成工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8ECI-CD%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-text">对于CI&#x2F;CD的理解</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jenkins"><span class="toc-text">Jenkins</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE"><span class="toc-text">安装配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-text">使用流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">注意点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-text">参考文章</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8B%93%E5%B1%95%E9%98%85%E8%AF%BB"><span class="toc-text">拓展阅读</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Log"><span class="toc-text">Log</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-post/Use-Jenkins" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">持续集成和Jenkins杂谈</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.11.28</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>SkybcYang</span>
+        </span>
+      
+
+      
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
     </div>
-</nav>
+  </header>
+
+  <div class="article-content">
     
-    <section class="section">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-8-tablet is-8-desktop is-8-widescreen has-order-2 column-main"><div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                
-                <time class="level-item has-text-grey" datetime="2018-11-28T06:35:09.000Z">2018-11-28</time>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    16 分钟 读完 (大约 2355 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                持续集成和Jenkins杂谈
-            
-        </h1>
-        <div class="content">
-            <html><head></head><body><p>关于持续集成/持续部署/持续交付的认识和看法，以及我设计的一个CI/CD流程。</p>
+      <p>关于持续集成/持续部署/持续交付的认识和看法，以及我设计的一个CI/CD流程。</p>
 <a id="more"></a>
 <h2 id="持续集成、部署和交付"><a href="#持续集成、部署和交付" class="headerlink" title="持续集成、部署和交付"></a>持续集成、部署和交付</h2><p>在写Jenkins的时候觉得还是把CI、CD和CD说一下吧。</p>
 <ul>
@@ -220,7 +254,7 @@
 <p>安装运行后，默认运行端口是8080，访问<code>serverurl:8080</code>,会有一个unlock阶段，新建用户需要管理员权限，管理员密码在<code>cat /var/lib/jenkins/secrets/initialAdminPassword</code>中，不熟悉插件的话就按照推荐的安装一遍，使用教程不赘述，下面说一下Jenkins可以被用来做什么。</p>
 <h4 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h4><p>使用Jenkins集成测试项目时需要在Github中设置Webhook，每次Commit会发一个带有项目更新信息的Post给Jenkins服务器，要求Jenkins服务器的必须在公网下。Jenkins服务器接到了Webhook后拉去相应分支代码，在本地测试，docker构建镜像然后运行，可以很方便地看到每次提交后代码的构建状态和构建历史。</p>
 <p>在使用的时候我比较喜欢BlueOcean——Jenkins的一个UI插件，美观顺手无脑，主要用来构建Pipeline项目，Pipeline的构建是根据Jenkinsfile走的，类似于Dockerfile，如果原先项目代码中没有Jenkinsfile，则会通过可视化操作引导创建一个使用流程，最后自动生成一个Jenkinsfile，也可以手动编写。Jenkinsfile使用groovy语法，指定agent、创建stages、执行steps等，下面是一个简单案例</p>
-<figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pipeline{</span><br><span class="line">    agent : any</span><br><span class="line">    stages{</span><br><span class="line">        stage('start'){</span><br><span class="line">            sh 'echo hello,'</span><br><span class="line">        }</span><br><span class="line">        stage('end'){</span><br><span class="line">            sh 'echo world'</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pipeline&#123;</span><br><span class="line">    agent : any</span><br><span class="line">    stages&#123;</span><br><span class="line">        stage(&#39;start&#39;)&#123;</span><br><span class="line">            sh &#39;echo hello,&#39;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(&#39;end&#39;)&#123;</span><br><span class="line">            sh &#39;echo world&#39;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Jenkins通过自定义的流程可以完成很多事，官方文档中包括<a target="_blank" rel="noopener" href="https://jenkins.io/doc/tutorials/build-a-java-app-with-maven">Build a Java app with Maven</a>、<a target="_blank" rel="noopener" href="https://jenkins.io/doc/tutorials/build-a-node-js-and-react-app-with-npm">Build a Node.js and React app with npm</a>、<a target="_blank" rel="noopener" href="https://jenkins.io/doc/tutorials/build-a-python-app-with-pyinstaller">Build a Python app with PyInstaller</a>，这些都是一套完整的流程，一些可以插入的额外功能比如说设置环境变量、邮件提示、记录测试结果等。</p>
 <p>使用的代码仓库github也好，自建的gitlab也行，设置好webhook就行。</p>
 <img src="/2018/11/28/post/Use-Jenkins/process.png" class="" title="This is an example image">
@@ -228,7 +262,7 @@
 <p>使用阿里云的镜像仓库和Docker Swarm搭建服务（适用于中小型企业）的流程基本上如上图所示。Jenkins根据分支选择条件将打包的镜像推送到对应的镜像仓库，设置推送镜像自动触发构建，Docker Swarm就拉取镜像构建了。ps.阿里云的镜像仓库和Docker Swarm之间可以走内网，省一些流量费用。</p>
 <p>关于这个模型的反思，根据<a target="_blank" rel="noopener" href="https://yaowenjie.github.io/devops/thinking-in-two-kinds-of-ci-cd-strategies-and-git-branch-models">关于两种CI/CD策略以及git分支模型的思考 – Bu・log</a>，模型应该适当拉长流程，分隔出一个测试环境，理论来说，为了项目镜像的完全正确性，需要每次初始化一个新的环境进行测试，会耗费大量时间延长构建过程的周期，这里的取舍就见仁见智了。</p>
 <h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h4><ol>
-<li>修改Jenkins默认端口 <figure class="highlight plain hljs"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/sysconfig/jenkins </span><br><span class="line">// 修改JENKINS_PORT为8081 </span><br><span class="line">JENKINS_PORT="8081" </span><br></pre></td></tr></tbody></table></figure></li>
+<li>修改Jenkins默认端口 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;sysconfig&#x2F;jenkins </span><br><span class="line">&#x2F;&#x2F; 修改JENKINS_PORT为8081 </span><br><span class="line">JENKINS_PORT&#x3D;&quot;8081&quot; </span><br></pre></td></tr></table></figure></li>
 <li>Jenkins分为master节点和slave节点，master分配任务给slave，在构建任务并发的时候缓解压力。</li>
 <li>可以使用参数化构建，根据变量回滚前几次的构建情况（没试验过）。参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/dceaa1c7bb49">使用jenkins进行项目的自动构建部署&amp;&amp;回滚 - 简书</a></li>
 </ol>
@@ -239,646 +273,212 @@
 <p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/dceaa1c7bb49">使用jenkins进行项目的自动构建部署&amp;&amp;回滚 - 简书</a></p>
 <h4 id="拓展阅读"><a href="#拓展阅读" class="headerlink" title="拓展阅读"></a>拓展阅读</h4><p><a target="_blank" rel="noopener" href="http://fex.baidu.com/blog/2015/07/front-end-test/">前端自动化测试探索</a></p>
 <h4 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h4><p>[2018-5-5]最近在忙毕设，我先把坑占好，原先Jenkins的东西就很多很杂，不然等做完毕业设计啥都不想干了全忘了那岂不是亏大发了。虽然我不是一个经验丰富的开发者，接触过的持续集成工具目前只有Jenkins，但是我希望我的想法能给你带来一些帮助。之后我也会去使用Travis-ci，对比一下,补充本文内容。<br>[2018-5-9]添加了一些内容，但是还没有补全，未完待续。。。但是写着写着就像是使用教程了，之后应该还会修改，写博客的目的是为了传达idea，而不是简单的教程，警！限于认识的局限性，我对workflow的认识还很浅，暂时就没有写上去了，希望在后续的学习中能够弄明白，更新待续。。<br>[2018-8-15]摸鱼了快两个月，好多东西都忘得差不多了，趁现在赶紧修改文章。在写博客的时候，想到什么写什么，很多地方不是使用过且深有体会的人是没办法跟上的，就先写成这样，之后多练练文笔，好好组织一下文章也许会好些。</p>
-</body></html>
-        </div>
-        
-        <div class="level is-size-7 is-uppercase">
-            <div class="level-start">
-                <div class="level-item">
-                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
-                    <a class="has-link-grey -link-link" href="/tags/CI-CD/" rel="tag">CI/CD</a>, <a class="has-link-grey -link-link" href="/tags/Jenkins/" rel="tag">Jenkins</a>
-                </div>
-            </div>
-        </div>
-        
-        
-        
-        <div class="social-share"></div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css">
-<script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
-        
-    </div>
-</div>
-
-
-
-<div class="card">
-    <div class="card-content">
-        <h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3>
-        <div class="buttons is-centered">
-            
-                
-<a class="button is-info donate">
-    <span class="icon is-small">
-        <i class="fab fa-alipay"></i>
-    </span>
-    <span>支付宝</span>
-    <div class="qrcode"><img src="/images/alipay.png" alt="支付宝"></div>
-</a>
-
-                
-                
-<a class="button is-success donate">
-    <span class="icon is-small">
-        <i class="fab fa-weixin"></i>
-    </span>
-    <span>微信</span>
-    <div class="qrcode"><img src="/images/wechatpay.png" alt="微信"></div>
-</a>
-
-                
-        </div>
-    </div>
-</div>
-
-
-
-<div class="card card-transparent">
-    <div class="level post-navigation is-flex-wrap is-mobile">
-        
-        <div class="level-start">
-            <a class="level level-item has-link-grey  article-nav-prev" href="/2018/12/29/post/Change-Terminal/">
-                <i class="level-item fas fa-chevron-left"></i>
-                <span class="level-item">Ubuntu18.04终端更换为深度终端</span>
-            </a>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-</div>
-                
-
-
-
-
-<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left is-sticky">
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <nav class="level">
-            <div class="level-item has-text-centered" style="flex-shrink: 1">
-                <div>
-                    
-                    <figure class="image is-128x128 has-mb-6">
-                        <img class="" src="/images/avatar.png" alt="skybcyang">
-                    </figure>
-                    
-                    <p class="is-size-4 is-block">
-                        skybcyang
-                    </p>
-                    
-                    
-                    <p class="is-size-6 is-block">
-                        出于兴趣
-                    </p>
-                    
-                    
-                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
-                        <i class="fas fa-map-marker-alt has-mr-7"></i>
-                        <span>Shanghai, China</span>
-                    </p>
-                    
-                </div>
-            </div>
-        </nav>
-        <nav class="level is-mobile">
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <a href="/archives">
-                        <p class="heading">
-                            文章
-                        </p>
-                        <p class="title has-text-weight-normal">
-                            17
-                        </p>
-                    </a>
-                </div>
-            </div>
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <a href="/categories">
-                        <p class="heading">
-                            分类
-                        </p>
-                        <p class="title has-text-weight-normal">
-                            5
-                        </p>
-                    </a>
-                </div>
-            </div>
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <a href="/tags">
-                        <p class="heading">
-                            标签
-                        </p>
-                        <p class="title has-text-weight-normal">
-                            8
-                        </p>
-                    </a>
-                </div>
-            </div>
-        </nav>
-        <!-- <div class="level">
-            <a class="level-item button is-link is-rounded" href="https://github.com/skybcyang" target="_blank">
-                关注我</a>
-        </div> -->
-        
-        
-        <div class="level is-mobile">
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Github" href="https://github.com/skybcyang">
-                
-                <i class="fab fa-github"></i>
-                
-            </a>
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Leetcode" href="https://leetcode-cn.com/u/skybcyang/">
-                
-                <i class="fas fa-laptop-code"></i>
-                
-            </a>
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Steam" href="https://steamcommunity.com/id/969160275/">
-                
-                <i class="fab fa-steam"></i>
-                
-            </a>
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Cloudmusic" href="https://music.163.com/#/user/home?id=265292189">
-                
-                <i class="fas fa-music"></i>
-                
-            </a>
-            
-        </div>
-        
-    </div>
-</div>
-    
-        
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <h3 class="menu-label">
-            标签云
-        </h3>
-        <a href="/tags/CI-CD/" style="font-size: 10px;">CI/CD</a> <a href="/tags/Jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/tags/deepin/" style="font-size: 10px;">deepin</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/icarus/" style="font-size: 10px;">icarus</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" style="font-size: 10px;">单例模式</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 10px;">设计模式</a>
-    </div>
-</div>
 
     
-        
-<div class="card widget">
-    <div class="card-content">
-        <h3 class="menu-label">
-            最新文章
-        </h3>
-        
-        <article class="media">
-            <!-- 
-            <a href="/2020/06/27/post/Chinese-Chess-Game/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/images/thumbnail.svg" alt="关于象棋编程比赛">
-                </p>
-            </a>
-             -->
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-06-27T07:03:04.000Z">2020-06-27</time></div>
-                    <a href="/2020/06/27/post/Chinese-Chess-Game/" class="title has-link-black-ter is-size-6 has-text-weight-normal">关于象棋编程比赛</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            <!-- 
-            <a href="/2020/06/27/github/Github-Repo-ElevatorScheduling/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/images/thumbnail.svg" alt="电梯调度算法">
-                </p>
-            </a>
-             -->
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-06-27T06:56:33.000Z">2020-06-27</time></div>
-                    <a href="/2020/06/27/github/Github-Repo-ElevatorScheduling/" class="title has-link-black-ter is-size-6 has-text-weight-normal">电梯调度算法</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/github/">github</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            <!-- 
-            <a href="/2020/06/27/github/Github-Repo-Leetcode/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/images/thumbnail.svg" alt="LeetCode解题记录">
-                </p>
-            </a>
-             -->
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-06-27T06:50:04.000Z">2020-06-27</time></div>
-                    <a href="/2020/06/27/github/Github-Repo-Leetcode/" class="title has-link-black-ter is-size-6 has-text-weight-normal">LeetCode解题记录</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/github/">github</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            <!-- 
-            <a href="/2020/06/07/post/Process-Image/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Process-Image">
-                </p>
-            </a>
-             -->
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-06-07T03:53:11.000Z">2020-06-07</time></div>
-                    <a href="/2020/06/07/post/Process-Image/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Process-Image</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            <!-- 
-            <a href="/2020/06/04/photo/First-Photo/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/images/thumbnail.svg" alt="第一张像样的照片">
-                </p>
-            </a>
-             -->
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-06-03T18:29:24.000Z">2020-06-04</time></div>
-                    <a href="/2020/06/04/photo/First-Photo/" class="title has-link-black-ter is-size-6 has-text-weight-normal">第一张像样的照片</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/photo/">photo</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-    </div>
-</div>
+  </div>
 
-    
-        <div class="card widget">
-    <div class="card-content">
-        <div class="menu">
-        <h3 class="menu-label">
-            归档
-        </h3>
-        <ul class="menu-list">
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持skybcyang</div>
+        <ul>
         
-        <li>
-            <a class="level is-marginless" href="/archives/2020/06/">
-                <span class="level-start">
-                    <span class="level-item">六月 2020</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">5</span>
-                </span>
-            </a>
-        </li>
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
         
-        <li>
-            <a class="level is-marginless" href="/archives/2020/03/">
-                <span class="level-start">
-                    <span class="level-item">三月 2020</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/12/">
-                <span class="level-start">
-                    <span class="level-item">十二月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/11/">
-                <span class="level-start">
-                    <span class="level-item">十一月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">3</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/10/">
-                <span class="level-start">
-                    <span class="level-item">十月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">2</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/09/">
-                <span class="level-start">
-                    <span class="level-item">九月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">2</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/01/">
-                <span class="level-start">
-                    <span class="level-item">一月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2018/12/">
-                <span class="level-start">
-                    <span class="level-item">十二月 2018</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2018/11/">
-                <span class="level-start">
-                    <span class="level-item">十一月 2018</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
         
         </ul>
-        </div>
+      </div>
     </div>
-</div>
-    
-        
+  </div>
 
-<div class="card widget">
-    <div class="card-content">
-        <div class="menu">
-        <h3 class="menu-label">
-            链接
-        </h3>
-        <ul class="menu-list">
-        
-            <li>
-                <a class="level is-mobile" href="https://kasora.moe" target="_blank">
-                    <span class="level-left">
-                        <span class="level-item">kasora</span>
-                    </span>
-                    <span class="level-right">
-                        <span class="level-item tag">kasora.moe</span>
-                    </span>
-                </a>
-            </li>
-        
-        </ul>
-        </div>
-    </div>
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="hide pull-left" href="/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2018/12/29/post/Change-Terminal/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
 </div>
 
 
-    
-    
-        <div class="column-right-shadow is-hidden-widescreen ">
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
         
-        </div>
-    
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
 </div>
 
-                
-            </div>
-        </div>
-    </section>
-    <footer class="footer">
-    <div class="container">
-        <div class="level">
-            <div class="level-start has-text-centered-mobile">
-                <a class="footer-logo is-block has-mb-6" href="/">
-                
-                    <img src="/images/favicon-32x32.png" alt="持续集成和Jenkins杂谈" height="28">
-                
-                </a>
-                <p class="is-size-7">
-                &copy; 2021 SkybcYang&nbsp;
-                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
-                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
-                
-                </p>
-            </div>
-            <div class="level-end">
-            
-                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
-                
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
-                        
-                        <i class="fab fa-creative-commons"></i>
-                        
-                    </a>
-                </p>
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
-                        
-                        <i class="fab fa-creative-commons-by"></i>
-                        
-                    </a>
-                </p>
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus">
-                        
-                        <i class="fab fa-github"></i>
-                        
-                    </a>
-                </p>
-                
-                </div>
-            
-            </div>
-        </div>
-    </div>
-</footer>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
-<script>moment.locale("zh-CN");</script>
 
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+<!-- Gitalk评论插件通用代码 -->
+<div id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
 <script>
-var IcarusThemeSettings = {
-    article: {
-        highlight: {
-            clipboard: false,
-            fold: 'unfolded'
+const gitalk = new Gitalk({
+  clientID: '11f74a60d7351bb18175',
+  clientSecret: 'eb8d06f4104c7de20325d416fda887ded91c2ab7',
+  repo: 'blog-comment',
+  owner: 'skybcyang',
+  // 在这里设置一下截取前50个字符串, 这是因为 github 对 label 的长度有了要求, 如果超过
+  // 50个字符串则会报错.
+  // id: location.pathname.split('/').pop().substring(0, 49),
+  id: md5(location.pathname),
+  admin: ['skybcyang'],
+  // facebook-like distraction free mode
+  distractionFreeMode: false
+})
+gitalk.render('gitalk-container')
+</script>
+<!-- Gitalk代码结束 -->
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
         }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
     }
-};
-</script>
 
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
 
-
-
-    
-    
-    
-    <script src="/js/animation.js"></script>
-    
-
-    
-    
-    
-    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
-    <script src="/js/gallery.js" defer></script>
-    
-
-    
-    
-
-<div id="outdated">
-    <h6>Your browser is out-of-date!</h6>
-    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" target="_blank" rel="noopener" href="http://outdatedbrowser.com/">Update
-            my browser now </a></p>
-    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        outdatedBrowser({
-            bgColor: '#f25648',
-            color: '#ffffff',
-            lowerThan: 'flex'
-        });
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
     });
+  }
 </script>
 
-
-    
-    
-<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    MathJax.Hub.Config({
-        'HTML-CSS': {
-            matchFontHeight: false
-        },
-        SVG: {
-            matchFontHeight: false
-        },
-        CommonHTML: {
-            matchFontHeight: false
-        },
-        tex2jax: {
-            inlineMath: [
-                ['$','$'],
-                ['\\(','\\)']
-            ]
-        }
-    });
-});
-</script>
-
-    
-    
-
-<a id="back-to-top" title="回到顶端" href="javascript:;">
-    <i class="fas fa-chevron-up"></i>
-</a>
-<script src="/js/back-to-top.js" defer></script>
-
-
-    
-    
-
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-
-
-<script src="/js/main.js" defer></script>
-
-    
-    <div class="searchbox ins-search">
-    <div class="searchbox-container ins-search-container">
-        <div class="searchbox-input-wrapper">
-            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么..." />
-            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
-        </div>
-        <div class="searchbox-result-wrapper ins-section-wrapper">
-            <div class="ins-section-container"></div>
-        </div>
-    </div>
-</div>
-<script>
-    (function (window) {
-        var INSIGHT_CONFIG = {
-            TRANSLATION: {
-                POSTS: '文章',
-                PAGES: '页面',
-                CATEGORIES: '分类',
-                TAGS: '标签',
-                UNTITLED: '(无标题)',
-            },
-            CONTENT_URL: '/content.json',
-        };
-        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
-    })(window);
-</script>
-<script src="/js/insight.js" defer></script>
-<link rel="stylesheet" href="/css/search.css">
-<link rel="stylesheet" href="/css/insight.css">
-    
 </body>
 </html>
